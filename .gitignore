@@ -1,0 +1,10 @@
+/.fleet
+/.idea
+/.vscode
+/.zed
+/phpunit.xml
+/tests/.ugarit-forge
+/vendor
+composer.lock
+.phpunit.result.cache
+

@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Commands;
+
+use function Ugarit\Prompts\spin;
+use function Ugarit\Prompts\table;
+use function Ugarit\Prompts\warning;
+
+class SiteListCommand extends Command
+{
+    /**
+     * The signature of the command.
+     *
+     * @var string
+     */
+    protected $signature = 'site:list';
+
+    /**
+     * The description of the command.
+     *
+     * @var string
+     */
+    protected $description = 'List the sites';
+
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        $server = $this->currentServer();
+
+        $sites = spin(
+            fn () => collect($this->forge->serverSites($this->currentOrganization(), $server->id)->lazy()),
+            'Retrieving sites',
+        );
+
+        if ($sites->isEmpty()) {
+            warning('No sites found.');
+
+            return;
+        }
+
+        table(
+            ['ID', 'Name', 'PHP'],
+            $sites->map(function ($site) {
+                return [
+                    $site->id,
+                    $site->name,
+                    $site->phpVersion ? str_replace('PHP ', '', $site->phpVersion) : 'None',
+                ];
+            })->all(),
+        );
+    }
+}
